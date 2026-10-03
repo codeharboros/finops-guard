@@ -1,0 +1,136 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.9.5",
+  "resource_changes": [
+    {
+      "address": "azurerm_linux_virtual_machine.dev_api",
+      "mode": "managed",
+      "type": "azurerm_linux_virtual_machine",
+      "name": "dev_api",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "size": "Standard_D4s_v5",
+          "location": "uksouth",
+          "tags": { "environment": "dev" }
+        }
+      }
+    },
+    {
+      "address": "azurerm_linux_virtual_machine.ml_trainer",
+      "mode": "managed",
+      "type": "azurerm_linux_virtual_machine",
+      "name": "ml_trainer",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "size": "Standard_NC6s_v3",
+          "location": "westeurope",
+          "tags": { "environment": "prod", "owner": "ml-team", "cost_center": "cc-ml-01" }
+        }
+      }
+    },
+    {
+      "address": "azurerm_kubernetes_cluster.platform",
+      "mode": "managed",
+      "type": "azurerm_kubernetes_cluster",
+      "name": "platform",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "location": "uksouth",
+          "default_node_pool": [
+            { "vm_size": "Standard_D4s_v5", "node_count": 3 }
+          ],
+          "tags": { "environment": "prod", "owner": "platform", "cost_center": "cc-plat-01" }
+        }
+      }
+    },
+    {
+      "address": "aws_db_instance.analytics",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "name": "analytics",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "instance_class": "db.m5.xlarge",
+          "multi_az": true,
+          "region": "eu-central-1",
+          "tags": {}
+        }
+      }
+    },
+    {
+      "address": "databricks_cluster.etl",
+      "mode": "managed",
+      "type": "databricks_cluster",
+      "name": "etl",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "node_type_id": "Standard_DS4_v2",
+          "num_workers": 4,
+          "region": "westeurope",
+          "custom_tags": { "environment": "staging", "owner": "data-eng" }
+        }
+      }
+    },
+    {
+      "address": "databricks_sql_endpoint.bi",
+      "mode": "managed",
+      "type": "databricks_sql_endpoint",
+      "name": "bi",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "cluster_size": "Small",
+          "region": "uksouth",
+          "custom_tags": { "environment": "prod", "owner": "bi", "cost_center": "cc-bi-01" }
+        }
+      }
+    },
+    {
+      "address": "azurerm_container_registry.shared",
+      "mode": "managed",
+      "type": "azurerm_container_registry",
+      "name": "shared",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "sku": "Premium",
+          "location": "uksouth",
+          "tags": { "environment": "prod", "owner": "platform", "cost_center": "cc-plat-01" }
+        }
+      }
+    },
+    {
+      "address": "azurerm_key_vault.secrets",
+      "mode": "managed",
+      "type": "azurerm_key_vault",
+      "name": "secrets",
+      "change": {
+        "actions": ["create"],
+        "after": {
+          "location": "uksouth",
+          "tags": { "environment": "prod", "owner": "platform", "cost_center": "cc-plat-01" }
+        }
+      }
+    },
+    {
+      "address": "azurerm_linux_virtual_machine.legacy_api",
+      "mode": "managed",
+      "type": "azurerm_linux_virtual_machine",
+      "name": "legacy_api",
+      "change": {
+        "actions": ["delete"],
+        "after": null,
+        "before": {
+          "size": "Standard_D8s_v5",
+          "location": "uksouth",
+          "tags": { "environment": "prod", "owner": "platform", "cost_center": "cc-plat-01" }
+        }
+      }
+    }
+  ]
+}

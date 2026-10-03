@@ -1,0 +1,39 @@
+# Drop this in .github/workflows/finops-guard.yml in a Terraform repo.
+# It plans, converts the plan to JSON, and lets finops-guard comment + gate the PR.
+name: finops-guard
+on:
+  pull_request:
+    paths: ["**/*.tf", "**/*.tfvars"]
+
+permissions:
+  contents: read
+  pull-requests: write   # needed to post the PR comment
+
+jobs:
+  cost-carbon-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Generate the plan JSON. Use `-var`/backends as your repo needs; this is
+      # a read-only plan, so no credentials with write access are required.
+      - name: Terraform plan
+        run: |
+          terraform init -input=false
+          terraform plan -out=tfplan -input=false
+          terraform show -json tfplan > plan.json
+
+      - name: finops-guard
+        uses: AkshaySoooryavanshi/finops-guard@v0
+        with:
+          plan: plan.json
+          config: .finops-guard.yml
+          fail-on: fail

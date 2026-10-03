@@ -1,0 +1,48 @@
+name: "finops-guard"
+description: "Comment the cost, carbon and governance impact of a Terraform plan on the PR, and optionally fail the check."
+branding:
+  icon: "dollar-sign"
+  color: "green"
+inputs:
+  plan:
+    description: "Path to a `terraform show -json` plan file."
+    required: true
+  config:
+    description: "Path to .finops-guard.yml (optional)."
+    required: false
+    default: ".finops-guard.yml"
+  fail-on:
+    description: '"fail" (default) or "warn" to block on warnings too.'
+    required: false
+    default: "fail"
+  comment:
+    description: "Post the result as a PR comment (true/false)."
+    required: false
+    default: "true"
+runs:
+  using: "composite"
+  steps:
+    - name: Run finops-guard
+      shell: bash
+      run: |
+        python -m pip install --quiet "${{ github.action_path }}[yaml]"
+        CONFIG_ARG=""
+        if [ -f "${{ inputs.config }}" ]; then CONFIG_ARG="--config ${{ inputs.config }}"; fi
+        set +e
+        finops-guard check "${{ inputs.plan }}" $CONFIG_ARG --fail-on "${{ inputs.fail-on }}" --out finops-guard-comment.md
+        echo "FINOPS_GUARD_EXIT=$?" >> "$GITHUB_ENV"
+        set -e
+    - name: Post PR comment
+      if: ${{ inputs.comment == 'true' && github.event_name == 'pull_request' }}
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh pr comment "${{ github.event.pull_request.number }}" --body-file finops-guard-comment.md --repo "${{ github.repository }}" || true
+    - name: Enforce gate
+      shell: bash
+      run: |
+        if [ "${FINOPS_GUARD_EXIT}" != "0" ]; then
+          echo "finops-guard gate failed (exit ${FINOPS_GUARD_EXIT})."
+          exit "${FINOPS_GUARD_EXIT}"
+        fi

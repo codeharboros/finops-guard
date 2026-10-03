@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "finops-guard"
+version = "0.1.0"
+description = "Shift-left cost, carbon and governance checks for Terraform plans — a PR gate that can fail CI."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "finops-guard contributors" }]
+keywords = ["finops", "terraform", "cost", "carbon", "greenops", "ci", "governance"]
+dependencies = []
+
+[project.optional-dependencies]
+yaml = ["pyyaml>=6.0"]
+
+[project.scripts]
+finops-guard = "finops_guard.cli:main"
+
+[tool.setuptools]
+packages = ["finops_guard"]

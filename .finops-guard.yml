@@ -1,0 +1,25 @@
+# finops-guard configuration — all keys optional; omitted keys use the defaults.
+
+# Tags every new, cost-bearing resource must carry.
+required_tags:
+  - environment
+  - owner
+  - cost_center
+
+# A single new resource at/above this monthly cost (GBP) is flagged for review.
+warn_cost_gbp: 300
+# ...and at/above this it hard-fails the gate until signed off.
+fail_cost_gbp: 1500
+# A new resource with no owner/cost-centre tag costing at/above this hard-fails.
+fail_untagged_gbp: 300
+
+# Carbon nudges (suggest a cleaner region for dirty-grid deployments).
+carbon_checks: true
+# Flag non-prod VMs/clusters to confirm an auto-shutdown schedule.
+nonprod_shutdown_check: true
+
+# "fail" = only hard findings block the merge; "warn" = warnings block too.
+fail_on: fail
+
+# Per-engagement USD->GBP override (optional).
+# fx_usd_gbp: 0.79
